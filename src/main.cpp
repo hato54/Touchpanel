@@ -54,11 +54,12 @@ void setup() {
   ScaleFactorY = (float)DISPLAY_Y / (float)MAX_Y;
 
   Serial.begin(115200);
+  Serial.println("Start");
   
 }
 
 void loop() {
-   while(digitalRead(Enable)){
+   while(digitalRead(Enable)){  // Running program is allowed
      // Setup X reading
     digitalWrite(TopLeftPNP, LOW);
     digitalWrite(TopLeftNPN, LOW);
@@ -74,7 +75,7 @@ void loop() {
     // Read X position
     Xpos = (int)(ScaleFactorX * (float)(analogRead(SenseValue)-75));
 
-         // Setup X reading
+    // Setup Y reading
     digitalWrite(TopLeftPNP, HIGH);
     digitalWrite(TopLeftNPN, HIGH);
     digitalWrite(BottomRightPNP, LOW);
@@ -89,6 +90,27 @@ void loop() {
     // Read Y position
     Ypos = (int)(ScaleFactorY * (float)(analogRead(SenseValue)-75));
  
+    if(Xpos < ILEGAL_X_VALLUE){
+      IdleFlag = true;
+    }else{
+      if(IdleFlag){ // This is the first legal value
+        IdleFlag = false;
+        V_CounterX = 1;
+      }else if(!Click){ // Check values
+        if(Xpos - LastX_Value > MIN_DIFFERENCE && abs(Xpos -LastX_Value) < MAX_DIFFERENSE){ // Finger is pressed and still
+          V_CounterX++;
 
- } // end of Enable check
+        }else{  // Finger is lifted
+          if(V_CounterX >=1 && V_CounterX <= 6){
+            Serial.print(V_CounterX); Serial.print('-');Serial.println(LastX_Value);
+          }
+
+        }
+      }else{  // Handle Click
+
+      }
+    }
+    LastX_Value = Xpos;
+    LastY_Value = Ypos;
+  } // end of - Running program is allowed
 }
