@@ -107,7 +107,7 @@ void loop() {
 
         }
       }else{  // Handle Click
-
+ 
       }
     }
     LastX_Value = Xpos;
